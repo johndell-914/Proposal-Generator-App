@@ -231,3 +231,57 @@ Stripe webhook endpoint: `https://your-domain.netlify.app/api/stripe/webhook`
 - Complete Stripe test payment (card `4242 4242 4242 4242`) → confirm `paid_at` set
 - Success animation plays
 - Dashboard shows updated proposal status
+
+---
+
+## What Was Built
+
+All code is written and the production build passes with zero errors.
+
+**Routes:**
+- `/login`, `/signup` — Supabase Auth
+- `/dashboard` — proposals list with status badges (draft / sent / signed / paid)
+- `/dashboard/proposals/new` — 3-step AI wizard (Brief → Review/Edit → Pricing)
+- `/dashboard/proposals/[id]/edit` — full inline editor with publish/draft controls
+- `/p/[slug]` — public client page (no auth) with sign + pay flow
+
+**Client flow on `/p/[slug]`:**
+Cover → Executive Summary → Scope of Work → Timeline → Investment table → Terms → Sign (drawn signature) → Pay (Stripe Elements) → Success animation (Framer Motion confetti + checkmark)
+
+---
+
+## Setup & Go-Live Checklist
+
+### 1. Supabase — Create project at supabase.com, then run the SQL from the Database Schema section above in the Supabase SQL editor.
+
+### 2. Fill in `.env.local`
+Replace all placeholder values with real keys from Supabase, Stripe, and Anthropic:
+```
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
+ANTHROPIC_API_KEY=
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=
+STRIPE_SECRET_KEY=
+STRIPE_WEBHOOK_SECRET=
+NEXT_PUBLIC_APP_URL=https://your-site.netlify.app
+```
+
+### 3. Stripe — Set up webhook
+After deploying to Netlify, create a webhook in the Stripe dashboard:
+- Endpoint URL: `https://your-site.netlify.app/api/stripe/webhook`
+- Event to listen for: `payment_intent.succeeded`
+- Copy the webhook signing secret into `STRIPE_WEBHOOK_SECRET`
+
+### 4. Netlify — Deploy
+1. Push repo to GitHub (already done)
+2. Connect repo to Netlify (New Site → Import from GitHub)
+3. Add all env vars under Site Settings → Environment Variables
+4. Deploy — Netlify auto-detects Next.js via `@netlify/plugin-nextjs`
+
+### 5. Test end-to-end
+- Sign up, create a proposal, confirm AI generates all sections
+- Publish → copy `/p/[slug]` URL → open in incognito (no auth)
+- Draw signature → confirm status changes to `signed` in Supabase dashboard
+- Pay with Stripe test card `4242 4242 4242 4242` (any future date, any CVC)
+- Confirm `paid_at` is set in Supabase and success animation plays
