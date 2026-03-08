@@ -236,7 +236,7 @@ Stripe webhook endpoint: `https://your-domain.netlify.app/api/stripe/webhook`
 
 ## What Was Built
 
-All code is written and the production build passes with zero errors.
+All code is written, the production build passes with zero errors, and the app is running locally.
 
 **Routes:**
 - `/login`, `/signup` — Supabase Auth
@@ -248,38 +248,44 @@ All code is written and the production build passes with zero errors.
 **Client flow on `/p/[slug]`:**
 Cover → Executive Summary → Scope of Work → Timeline → Investment table → Terms → Sign (drawn signature) → Pay (Stripe Elements) → Success animation (Framer Motion confetti + checkmark)
 
+**GitHub repo:** https://github.com/johndell-914/Proposal-Generator-App
+
 ---
 
 ## Setup & Go-Live Checklist
 
-### 1. Supabase — Create project at supabase.com, then run the SQL from the Database Schema section above in the Supabase SQL editor.
+### ✅ 1. Supabase — Project created and SQL schema executed
+- Project URL: `https://qegnnutrdytrwrwfpsnn.supabase.co`
+- `proposals` table created with RLS policies
+- Anon key, service role key configured
 
-### 2. Fill in `.env.local`
-Replace all placeholder values with real keys from Supabase, Stripe, and Anthropic:
-```
-NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_ANON_KEY=
-SUPABASE_SERVICE_ROLE_KEY=
-ANTHROPIC_API_KEY=
-NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=
-STRIPE_SECRET_KEY=
-STRIPE_WEBHOOK_SECRET=
-NEXT_PUBLIC_APP_URL=https://your-site.netlify.app
-```
+### ✅ 2. Fill in `.env.local` — COMPLETE
+All keys are in place:
+- `NEXT_PUBLIC_SUPABASE_URL` ✅
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY` ✅
+- `SUPABASE_SERVICE_ROLE_KEY` ✅
+- `ANTHROPIC_API_KEY` ✅
+- `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` ✅ (test mode)
+- `STRIPE_SECRET_KEY` ✅ (test mode)
+- `STRIPE_WEBHOOK_SECRET` ⏳ — add after Netlify deploy
+- `NEXT_PUBLIC_APP_URL` ✅ (`http://localhost:3000` for local, update after deploy)
 
-### 3. Stripe — Set up webhook
-After deploying to Netlify, create a webhook in the Stripe dashboard:
-- Endpoint URL: `https://your-site.netlify.app/api/stripe/webhook`
-- Event to listen for: `payment_intent.succeeded`
-- Copy the webhook signing secret into `STRIPE_WEBHOOK_SECRET`
+### ✅ 3. Dev server running
+App is live at `http://localhost:3000` — sign up and test locally.
 
-### 4. Netlify — Deploy
+### ⏳ 4. Stripe — Set up webhook (after Netlify deploy)
+1. Go to Stripe dashboard → Developers → Webhooks → Add endpoint
+2. Endpoint URL: `https://your-site.netlify.app/api/stripe/webhook`
+3. Event to listen for: `payment_intent.succeeded`
+4. Copy the webhook signing secret into `STRIPE_WEBHOOK_SECRET` in Netlify env vars
+
+### ⏳ 5. Netlify — Deploy
 1. Push repo to GitHub (already done)
 2. Connect repo to Netlify (New Site → Import from GitHub)
-3. Add all env vars under Site Settings → Environment Variables
+3. Add all env vars under Site Settings → Environment Variables (same as `.env.local`, update `NEXT_PUBLIC_APP_URL` to your Netlify domain)
 4. Deploy — Netlify auto-detects Next.js via `@netlify/plugin-nextjs`
 
-### 5. Test end-to-end
+### ⏳ 6. Test end-to-end
 - Sign up, create a proposal, confirm AI generates all sections
 - Publish → copy `/p/[slug]` URL → open in incognito (no auth)
 - Draw signature → confirm status changes to `signed` in Supabase dashboard
