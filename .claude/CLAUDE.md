@@ -18,6 +18,23 @@ To restart the dev server on Windows, kill existing Node processes first:
 powershell -Command "Get-Process -Name node -ErrorAction SilentlyContinue | Stop-Process -Force"
 ```
 
+## Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Framework | Next.js 16.1.6 (App Router, TypeScript) |
+| Styling | Tailwind CSS v4 + shadcn/ui |
+| Auth & Database | Supabase (Auth + PostgreSQL + RLS) |
+| ORM/Client | `@supabase/ssr` for server-side sessions; `@supabase/supabase-js` for client |
+| Payments | Stripe — `PaymentIntent` flow, API version `2026-02-25.clover` |
+| AI Generation | Anthropic SDK — model `claude-opus-4-6` |
+| E-Signature | `react-signature-canvas` |
+| Animations | Framer Motion |
+| Slug Generation | `nanoid` (8-char URL-safe IDs) |
+| Hosting | Netlify (`@netlify/plugin-nextjs`) |
+
+---
+
 ## Architecture
 
 ### Route Groups
